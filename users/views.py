@@ -6,10 +6,13 @@ from .serializers import UserProfileSerializer, UserProfilePublicSerializer
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnlyProfile]
 
     def get_serializer_class(self):
-        if self.request.method in permissions.SAFE_METHODS:
-            return UserProfilePublicSerializer  # Сериализатор для публичного просмотра профиля
-        return UserProfileSerializer
+        if self.request.method == 'GET':
+            return UserProfileSerializer
+        elif self.request.method == 'PATCH' or self.request.method == 'PUT':
+            return UserProfilePublicSerializer
+
+    def get_object(self):
+        return self.request.user
