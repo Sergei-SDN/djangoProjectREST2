@@ -10,6 +10,7 @@ class Course(models.Model):
     description = models.TextField()
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='пользователь',
                               on_delete=models.SET_NULL, **NULLABLE)
+    is_public = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -27,6 +28,7 @@ class Lesson(models.Model):
     video_link = models.URLField()
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='пользователь',
                               on_delete=models.SET_NULL, **NULLABLE)
+    is_public = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
