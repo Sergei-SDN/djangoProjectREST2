@@ -6,7 +6,6 @@ from .serializers import UserProfileSerializer, UserProfilePublicSerializer
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnlyProfile]
 
     def get_serializer_class(self):
