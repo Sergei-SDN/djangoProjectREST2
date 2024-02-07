@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.contrib.auth import get_user_model
 
 NULLABLE = {'null': True, 'blank': True}
 
@@ -21,7 +22,7 @@ class Course(models.Model):
 
 
 class Lesson(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons', verbose_name='курс')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons', verbose_name='курс', blank=True, null=True)
     name = models.CharField(max_length=255)
     description = models.TextField()
     preview = models.ImageField(upload_to='lesson_previews/', blank=True, null=True)
@@ -36,3 +37,17 @@ class Lesson(models.Model):
     class Meta:
         verbose_name = 'Урок'
         verbose_name_plural = 'Уроки'
+
+
+class CourseSubscription(models.Model):
+    is_subscribed = models.BooleanField(default=False, verbose_name='подписка', **NULLABLE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='курс', related_name='subscription')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='пользователь', on_delete=models.CASCADE,
+                             related_name='course_user', **NULLABLE)
+
+    def __str__(self):
+        return f'Курс {self.course} - подписка {self.is_subscribed}'
+
+    class Meta:
+        verbose_name = 'подписка'
+        verbose_name_plural = 'подписки'

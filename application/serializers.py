@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Course, Lesson
+from .models import Course, Lesson, CourseSubscription
+from .validators import LinkValidator
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -8,6 +9,8 @@ class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = '__all__'
+        validators = [LinkValidator(field='video_link'),
+                      serializers.UniqueTogetherValidator(fields=['video_link', 'name'], queryset=Lesson.objects.all())]
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -20,11 +23,20 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'preview', 'description', 'lessons', 'lessons_count']
 
     def get_lessons(self, obj):
-        """Метод для получения списка уроков курса.""" # Вычисляемые значения
+        """Метод для получения списка уроков курса."""  # Вычисляемые значения
         lessons = Lesson.objects.filter(course=obj)
         lesson_serializer = LessonSerializer(lessons, many=True)
         return lesson_serializer.data
 
     def get_lessons_count(self, obj):
-        """Метод для получения количества уроков курса.""" # Вычисляемые значения
+        """Метод для получения количества уроков курса."""  # Вычисляемые значения
         return obj.lessons.count()
+
+
+class SubscribeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseSubscription
+        fields = '__all__'
+        validators = [
+            serializers.UniqueTogetherValidator(fields=['course'],
+                                                queryset=CourseSubscription.objects.all())]
