@@ -6,3 +6,4 @@ django~=5.0.1
 django-filter~=23.5
 djangorestframework-simplejwt
 coverage
+drf-yasg

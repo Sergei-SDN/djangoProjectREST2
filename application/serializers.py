@@ -34,9 +34,19 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
+    # Добавляем новое поле для информации о подписке пользователя
+    is_subscribed = serializers.SerializerMethodField()
+
     class Meta:
         model = CourseSubscription
         fields = '__all__'
         validators = [
             serializers.UniqueTogetherValidator(fields=['course'],
                                                 queryset=CourseSubscription.objects.all())]
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        if request:
+            user = request.user
+            return obj.subscribers.filter(pk=user.pk).exists()
+        return False
