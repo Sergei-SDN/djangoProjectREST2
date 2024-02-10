@@ -5,7 +5,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 
-from application.services import get_session, retrieve_session
+from payments.services import get_session, retrieve_session
 from .models import Payment
 from .serializers import PaymentSerializer, PaymentCreateSerializer
 
