@@ -1,4 +1,3 @@
-from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from application.apps import ApplicationConfig
@@ -21,10 +20,6 @@ urlpatterns = [
          name='lesson-update'),
     path('api/lessons/destroy/<int:pk>/', LessonDestroyView.as_view(),
          name='lesson-destroy'),
-    # payment
-    # path('payment/', PaymentListAPIView.as_view(), name='payment-list'),
-    # path('payment/create/', PaymentCreateAPIView.as_view(), name='payment-create'),
-    # path('payment/<int:pk>/', PaymentRetrieveAPIView.as_view(), name='payment-detail'),
 
     # subscription
     path('subscriptions/', SubscriptionListAPIView.as_view(), name='subs-list'),
