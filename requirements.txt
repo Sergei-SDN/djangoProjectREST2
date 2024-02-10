@@ -9,3 +9,4 @@ coverage
 drf-yasg
 django-cors-headers
 requests
+stripe
