@@ -7,3 +7,5 @@ django-filter~=23.5
 djangorestframework-simplejwt
 coverage
 drf-yasg
+django-cors-headers
+requests

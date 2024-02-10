@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework_simplejwt',
     'drf_yasg',
+    'corsheaders',
 
     'users',
     'application',
@@ -60,6 +61,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'djangoProjectREST2.urls'
@@ -164,3 +167,16 @@ SIMPLE_JWT = {
 }
 # Задаем срок действия для access-токена (15 минут) и refresh-токена (1 день)
 # с использованием библиотеки Simple JWT в Django REST Framework.
+
+# Настройка CORS
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8000',  # Замените на адрес вашего фронтенд-сервера
+    "https://read-and-write.example.com"
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://read-and-write.example.com",  # Замените на адрес вашего фронтенд-сервера
+    # и добавьте адрес бэкенд-сервера
+]
+
+CORS_ALLOW_ALL_ORIGINS = False
