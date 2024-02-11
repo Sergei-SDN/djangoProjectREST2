@@ -5,7 +5,7 @@ from .paginators import CoursePagination, LessonPagination
 from .permissions import IsOwner, IsModerator, IsPublic
 from .serializers import CourseSerializer, LessonSerializer, SubscribeSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
+from application.tasks import send_course_update, send_lesson_adding
 
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
@@ -45,17 +45,22 @@ class CourseViewSet(viewsets.ModelViewSet):
         """
         serializer.save(owner=self.request.user)
 
+    def perform_update(self, serializer):
+        course_id = serializer.save(owner=self.request.user).id
+        send_course_update.delay(course_id)
+
 
 class LessonCreateView(generics.CreateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    # permission_classes = [IsAuthenticated, IsOwner, ~IsModerator]
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsOwner, ~IsModerator]
+    # permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
-        new_lesson = serializer.save()
-        new_lesson.owner = self.request.user
-        new_lesson.save()
+        course_id = serializer.save(owner=self.request.user).course.id
+        lesson_id = serializer.save().id
+        send_lesson_adding.delay(lesson_id, course_id)
+
 
 
 class LessonListView(generics.ListAPIView):
