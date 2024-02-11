@@ -20,10 +20,6 @@ class CourseSerializer(serializers.ModelSerializer):
     # Добавляем поле подписки пользователя на курс
     is_subscribed = serializers.SerializerMethodField()
 
-    class Meta:
-        model = Course
-        fields = ['id', 'name', 'preview', 'description', 'lessons', 'lessons_count']
-
     def get_lessons(self, obj):
         """Метод для получения списка уроков курса."""  # Вычисляемые значения
         lessons = Lesson.objects.filter(course=obj)
@@ -34,30 +30,23 @@ class CourseSerializer(serializers.ModelSerializer):
         """Метод для получения количества уроков курса."""  # Вычисляемые значения
         return obj.lessons.count()
 
-    def get_is_subscribed(self, obj):
-        # Получаем текущего пользователя
-        user = self.context['request'].user
+    def get_is_subscribed(self, instance):
+        return CourseSubscription.objects.filter(course=instance,
+                                                 user=self.context['request'].user).exists()
 
-        # Определяем статус подписки пользователя на курс
-        is_subscribed = user.course_subscriptions.filter(course=obj).exists()
-
-        return is_subscribed
+    class Meta:
+        model = Course
+        fields = '__all__'
+        validators = [
+            serializers.UniqueTogetherValidator(fields=['name'],
+                                                queryset=Course.objects.all())
+        ]
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
-    # Добавляем новое поле для информации о подписке пользователя
-    is_subscribed = serializers.SerializerMethodField()
-
     class Meta:
         model = CourseSubscription
         fields = '__all__'
         validators = [
             serializers.UniqueTogetherValidator(fields=['course'],
                                                 queryset=CourseSubscription.objects.all())]
-
-    def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        if request:
-            user = request.user
-            return obj.subscribers.filter(pk=user.pk).exists()
-        return False

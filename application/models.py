@@ -12,6 +12,7 @@ class Course(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='пользователь',
                               on_delete=models.SET_NULL, **NULLABLE)
     is_public = models.BooleanField(default=False)
+    price = models.IntegerField(default=1000, verbose_name='cтоимость курса')
 
     def __str__(self):
         return self.name
