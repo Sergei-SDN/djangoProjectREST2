@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'drf_yasg',
     'corsheaders',
+    'django_celery_beat',
 
     'users',
     'application',
@@ -168,6 +169,16 @@ SIMPLE_JWT = {
 # Задаем срок действия для access-токена (15 минут) и refresh-токена (1 день)
 # с использованием библиотеки Simple JWT в Django REST Framework.
 
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        },
+    },
+}
+
 # Настройка CORS
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',  # Замените на адрес вашего фронтенд-сервера
@@ -180,3 +191,41 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False
+
+# Настройки для Celery
+
+# URL-адрес брокера сообщений
+CELERY_BROKER_URL = 'redis://localhost:6379'  # Например, Redis, который по умолчанию работает на порту 6379
+
+# URL-адрес брокера результатов, также Redis
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+
+# Часовой пояс для работы Celery
+CELERY_TIMEZONE = os.getenv('TIME_ZONE_USER')
+
+# Флаг отслеживания выполнения задач
+CELERY_TASK_TRACK_STARTED = True
+
+# Максимальное время на выполнение задачи
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+# Настройки электронной почты
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Используем SMTP для отправки электронной почты
+EMAIL_HOST = 'smtp.yandex.ru'  # Адрес SMTP-сервера (в данном случае, Яндекс)
+EMAIL_PORT = 587  # Порт для подключения к SMTP-серверу
+EMAIL_USE_TLS = True  # Используем TLS для безопасного подключения
+EMAIL_HOST_USER = os.getenv('EMAIL_USER')  # Получаем имя пользователя (адрес электронной почты) из переменной окружения
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')  # Получаем пароль для почтового ящика из переменной окружения
+
+# Дополнительные настройки электронной почты
+EMAIL_SERVER = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
+
+# Настройки для Celery
+CELERY_BEAT_SCHEDULE = {
+    'task-name': {
+        'task': 'application.tasks.check_last_login',
+        'schedule': timedelta(days=1),
+    },
+}

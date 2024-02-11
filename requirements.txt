@@ -10,3 +10,6 @@ drf-yasg
 django-cors-headers
 requests
 stripe
+celery
+redis
+django-celery-beat
